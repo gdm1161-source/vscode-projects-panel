@@ -1,0 +1,134 @@
+{
+  "name": "ventprom-projects",
+  "displayName": "ВЕНТПРОМ — проекты в работе",
+  "description": "Панель слева: все проекты из PROJECTS.md на сервере, сгруппированные по статусу.",
+  "version": "1.0.1",
+  "publisher": "ventprom",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ventpromProjects",
+          "title": "ПРОЕКТЫ ВЕНТПРОМ",
+          "icon": "media/vp.svg"
+        }
+      ]
+    },
+    "views": {
+      "ventpromProjects": [
+        {
+          "id": "ventpromProjects.tree",
+          "name": "В работе",
+          "icon": "media/vp.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "ventpromProjects.refresh",
+        "title": "Обновить с сервера",
+        "icon": "$(refresh)",
+        "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.openBlock",
+        "title": "Открыть блок проекта",
+        "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.openFull",
+        "title": "Открыть весь PROJECTS.md (копия)",
+        "icon": "$(book)",
+        "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.copyStart",
+        "title": "Скопировать команду «Начать»",
+        "icon": "$(clippy)",
+        "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.toggleOnlyInWork",
+        "title": "Только «в работе» / все",
+        "icon": "$(filter)",
+        "category": "ПРОЕКТЫ"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "ventpromProjects.refresh",
+          "when": "view == ventpromProjects.tree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "ventpromProjects.toggleOnlyInWork",
+          "when": "view == ventpromProjects.tree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "ventpromProjects.openFull",
+          "when": "view == ventpromProjects.tree",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "ventpromProjects.copyStart",
+          "when": "view == ventpromProjects.tree && viewItem == vpProject",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "ПРОЕКТЫ ВЕНТПРОМ",
+      "properties": {
+        "ventpromProjects.sshExe": {
+          "type": "string",
+          "default": "C:/Windows/System32/OpenSSH/ssh.exe",
+          "description": "Путь к НАТИВНОМУ Windows ssh.exe (не из Git Bash)."
+        },
+        "ventpromProjects.host": {
+          "type": "string",
+          "default": "",
+          "description": "Сервер с реестром в виде user@host или имя из ~/.ssh/config. Задаётся локально — в коде адреса нет."
+        },
+        "ventpromProjects.remotePath": {
+          "type": "string",
+          "default": "~/PROJECTS.md",
+          "description": "Путь к PROJECTS.md на сервере."
+        },
+        "ventpromProjects.refreshMinutes": {
+          "type": "number",
+          "default": 10,
+          "description": "Автообновление, минут. 0 — только по кнопке."
+        },
+        "ventpromProjects.activeDays": {
+          "type": "number",
+          "default": 30,
+          "description": "Блок без явного статуса считается «в работе», если последняя дата в нём свежее этого числа дней."
+        },
+        "ventpromProjects.onlyInWork": {
+          "type": "boolean",
+          "default": false,
+          "description": "Показывать только группу «В работе»."
+        },
+        "ventpromProjects.timeoutSeconds": {
+          "type": "number",
+          "default": 10,
+          "description": "Таймаут ssh. При VPN-проблемах панель покажет кэш."
+        }
+      }
+    }
+  }
+}
