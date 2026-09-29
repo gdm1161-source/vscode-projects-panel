@@ -129,17 +129,19 @@ class Provider {
       out.push(i);
     }
 
-    const onlyWork = cfg().get('onlyInWork');
-    for (const g of ['work', 'plan', 'none', 'done']) {
-      if (onlyWork && g !== 'work') continue;
+    const filter = String(cfg().get('filter') || 'all');
+    for (const g of ['ready', 'work', 'plan', 'none', 'done']) {
+      if (filter === 'ready' && g !== 'ready') continue;
+      if (filter === 'work' && g !== 'ready' && g !== 'work') continue;
       const list = blocks.filter(b => b.group === g);
       if (!list.length) continue;
       const meta = GROUPS[g];
-      const i = new vscode.TreeItem(meta.label, g === 'work'
+      const i = new vscode.TreeItem(meta.label, (g === 'ready' || g === 'work')
         ? vscode.TreeItemCollapsibleState.Expanded
         : vscode.TreeItemCollapsibleState.Collapsed);
       i.description = String(list.length);
-      i.iconPath = new vscode.ThemeIcon(meta.icon);
+      i.iconPath = new vscode.ThemeIcon(meta.icon,
+        meta.accent ? new vscode.ThemeColor('charts.blue') : undefined);
       i.vpKind = 'group';
       i.vpGroup = g;
       i.id = 'g:' + g;
@@ -151,8 +153,11 @@ class Provider {
   projects(group) {
     return this.store.blocks().filter(b => b.group === group).map(b => {
       const i = new vscode.TreeItem(b.code, vscode.TreeItemCollapsibleState.Collapsed);
-      i.description = cut(b.title, 46) + (b.latest ? '  · ' + fmt(b.latest) : '');
-      i.iconPath = new vscode.ThemeIcon(b.group === 'work' ? 'circle-filled' : 'circle-outline');
+      i.description = (b.group === 'ready' ? '← ' + b.readyWhy + '  ·  ' : '') +
+        cut(b.title, b.group === 'ready' ? 30 : 46) + (b.latest ? '  · ' + fmt(b.latest) : '');
+      i.iconPath = b.group === 'ready'
+        ? new vscode.ThemeIcon('circle-filled', new vscode.ThemeColor('charts.blue'))
+        : new vscode.ThemeIcon(b.group === 'work' ? 'circle-filled' : 'circle-outline');
       i.contextValue = 'vpProject';
       i.vpKind = 'project';
       i.vpBlock = b;
@@ -162,7 +167,11 @@ class Provider {
       const t = new vscode.MarkdownString();
       t.appendMarkdown('### ' + b.code + ' — ' + b.title + '\n\n');
       t.appendMarkdown('**Группа:** ' + GROUPS[b.group].label + '  \n');
-      t.appendMarkdown('**Почему тут:** ' + b.why + '  \n');
+      t.appendMarkdown('**Почему тут:** ' + (b.group === 'ready' ? b.readyWhy : b.why) + '  \n');
+      if (b.attention && b.attention.length) {
+        t.appendMarkdown('\n**Ждёт тебя:**\n');
+        for (const a of b.attention) t.appendMarkdown('- ' + a.text + '\n');
+      }
       if (b.latest) t.appendMarkdown('**Последняя дата в блоке:** ' + fmt(b.latest) + '  \n');
       if (b.status) t.appendMarkdown('\n**' + (b.statusKey || 'Статус') + ':** ' + b.status + '\n');
       if (b.start) t.appendMarkdown('\n**Начать:** ' + b.start + '\n');
@@ -173,6 +182,15 @@ class Provider {
 
   details(b) {
     const out = [];
+    for (const a of (b.attention || [])) {
+      const i = new vscode.TreeItem(cut(a.text, 150));
+      i.iconPath = new vscode.ThemeIcon(
+        a.kind === 'done' ? 'pass-filled' : a.kind === 'gate' ? 'shield' : 'bell-dot',
+        new vscode.ThemeColor('charts.blue'));
+      i.tooltip = new vscode.MarkdownString('**' + a.why + '**\n\n' + a.text);
+      i.command = { command: 'ventpromProjects.openBlock', title: '', arguments: [b] };
+      out.push(i);
+    }
     for (const f of b.fields) {
       const i = new vscode.TreeItem(f.key);
       i.description = cut(f.value.replace(/`/g, ''), 140);
@@ -210,9 +228,13 @@ async function activate(ctx) {
 
   const paint = () => {
     const blocks = store.blocks();
+    const ready = blocks.filter(b => b.group === 'ready').length;
     const work = blocks.filter(b => b.group === 'work').length;
-    view.badge = work ? { value: work, tooltip: work + ' проектов в работе' } : undefined;
-    view.title = blocks.length ? 'В работе · ' + work + ' из ' + blocks.length : 'В работе';
+    view.badge = ready ? { value: ready, tooltip: ready + ' задач ждут тебя' }
+      : work ? { value: work, tooltip: work + ' проектов в работе' } : undefined;
+    view.title = blocks.length
+      ? 'Ждёт тебя ' + ready + ' · в работе ' + work
+      : 'Проекты';
     provider.refresh();
   };
   paint();
@@ -258,8 +280,11 @@ async function activate(ctx) {
       vscode.window.showInformationMessage('Скопировано: ' + cut(text, 80));
     }),
 
-    vscode.commands.registerCommand('ventpromProjects.toggleOnlyInWork', async () => {
-      await cfg().update('onlyInWork', !cfg().get('onlyInWork'), vscode.ConfigurationTarget.Global);
+    vscode.commands.registerCommand('ventpromProjects.cycleFilter', async () => {
+      const order = ['all', 'ready', 'work'];
+      const cur = String(cfg().get('filter') || 'all');
+      const next = order[(order.indexOf(cur) + 1) % order.length];
+      await cfg().update('filter', next, vscode.ConfigurationTarget.Global);
       paint();
     }),
 

@@ -2,7 +2,7 @@
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
   "description": "Панель слева: все проекты из PROJECTS.md на сервере, сгруппированные по статусу.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
@@ -58,8 +58,8 @@
         "category": "ПРОЕКТЫ"
       },
       {
-        "command": "ventpromProjects.toggleOnlyInWork",
-        "title": "Только «в работе» / все",
+        "command": "ventpromProjects.cycleFilter",
+        "title": "Фильтр: всё / только готовое / только активное",
         "icon": "$(filter)",
         "category": "ПРОЕКТЫ"
       }
@@ -72,7 +72,7 @@
           "group": "navigation@1"
         },
         {
-          "command": "ventpromProjects.toggleOnlyInWork",
+          "command": "ventpromProjects.cycleFilter",
           "when": "view == ventpromProjects.tree",
           "group": "navigation@2"
         },
@@ -118,15 +118,25 @@
           "default": 30,
           "description": "Блок без явного статуса считается «в работе», если последняя дата в нём свежее этого числа дней."
         },
-        "ventpromProjects.onlyInWork": {
-          "type": "boolean",
-          "default": false,
-          "description": "Показывать только группу «В работе»."
-        },
         "ventpromProjects.timeoutSeconds": {
           "type": "number",
           "default": 10,
           "description": "Таймаут ssh. При VPN-проблемах панель покажет кэш."
+        },
+        "ventpromProjects.filter": {
+          "type": "string",
+          "enum": [
+            "all",
+            "ready",
+            "work"
+          ],
+          "enumDescriptions": [
+            "Все группы",
+            "Только то, что ждёт тебя",
+            "Готовое и в работе"
+          ],
+          "default": "all",
+          "description": "Что показывать в панели; переключается кнопкой-воронкой в шапке."
         }
       }
     }
