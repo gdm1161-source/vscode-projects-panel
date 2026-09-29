@@ -48,7 +48,8 @@ function snippet(text, idx) {
 function attention(raw) {
   const out = [];
   for (const line of raw.split(/\r?\n/)) {
-    if (/^##\s/.test(line) || !line.trim()) continue;
+    // цитаты («> ») — пояснения о самих правилах, сигналами не считаются
+    if (/^##\s/.test(line) || /^\s*>/.test(line) || !line.trim()) continue;
     for (const a of ATTENTION) {
       const m = a.re.exec(clean(line));
       if (m) {

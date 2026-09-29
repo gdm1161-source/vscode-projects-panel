@@ -2,7 +2,7 @@
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
   "description": "Панель слева: все проекты из PROJECTS.md на сервере, сгруппированные по статусу.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
