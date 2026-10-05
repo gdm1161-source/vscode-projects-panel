@@ -12,6 +12,15 @@ const fmt = d => d
   : '';
 const cut = (s, n) => (s && s.length > n ? s.slice(0, n - 1) + '…' : s || '');
 
+// Путь для удалённой оболочки: в кавычках «~» не раскрывается, поэтому «~/…» → "$HOME"/'…'.
+const sq = s => "'" + String(s).replace(/'/g, "'\\''") + "'";
+function remoteArg(p) {
+  p = String(p || '~/PROJECTS.md').trim();
+  if (p === '~') return '"$HOME"';
+  if (p.startsWith('~/')) return '"$HOME"/' + sq(p.slice(2));
+  return sq(p);
+}
+
 // Кириллица через base64: stdout ssh под Windows иначе ломается кодировкой.
 function fetchRemote() {
   return new Promise((resolve, reject) => {
@@ -24,7 +33,7 @@ function fetchRemote() {
       '-o', 'ConnectTimeout=' + secs,
       '-o', 'StrictHostKeyChecking=accept-new',
       host,
-      'base64 -w0 ' + JSON.stringify(c.get('remotePath'))
+      'base64 -w0 ' + remoteArg(c.get('remotePath'))
     ];
     cp.execFile(c.get('sshExe'), args,
       { encoding: 'ascii', timeout: secs * 1000, maxBuffer: 16 * 1024 * 1024, windowsHide: true },

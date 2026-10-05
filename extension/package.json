@@ -2,7 +2,7 @@
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
   "description": "Панель слева: сессии Claude на этом ПК и все проекты из PROJECTS.md на сервере.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
