@@ -1,8 +1,8 @@
 {
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
-  "description": "Панель слева: все проекты из PROJECTS.md на сервере, сгруппированные по статусу.",
-  "version": "1.1.1",
+  "description": "Панель слева: сессии Claude на этом ПК и все проекты из PROJECTS.md на сервере.",
+  "version": "1.2.0",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
@@ -26,6 +26,11 @@
     },
     "views": {
       "ventpromProjects": [
+        {
+          "id": "ventpromProjects.sessions",
+          "name": "Сессии Claude",
+          "icon": "media/vp.svg"
+        },
         {
           "id": "ventpromProjects.tree",
           "name": "В работе",
@@ -62,6 +67,23 @@
         "title": "Фильтр: всё / только готовое / только активное",
         "icon": "$(filter)",
         "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.refreshSessions",
+        "title": "Обновить список сессий",
+        "icon": "$(refresh)",
+        "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.openSession",
+        "title": "Открыть сессию",
+        "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.copySessionName",
+        "title": "Скопировать имя для связи",
+        "icon": "$(clippy)",
+        "category": "ПРОЕКТЫ"
       }
     ],
     "menus": {
@@ -80,12 +102,22 @@
           "command": "ventpromProjects.openFull",
           "when": "view == ventpromProjects.tree",
           "group": "navigation@3"
+        },
+        {
+          "command": "ventpromProjects.refreshSessions",
+          "when": "view == ventpromProjects.sessions",
+          "group": "navigation@1"
         }
       ],
       "view/item/context": [
         {
           "command": "ventpromProjects.copyStart",
           "when": "view == ventpromProjects.tree && viewItem == vpProject",
+          "group": "inline"
+        },
+        {
+          "command": "ventpromProjects.copySessionName",
+          "when": "view == ventpromProjects.sessions && viewItem == vpSession",
           "group": "inline"
         }
       ]

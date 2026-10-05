@@ -3,6 +3,7 @@
 const vscode = require('vscode');
 const cp = require('child_process');
 const { parse, GROUPS } = require('./parser');
+const sessions = require('./sessions');
 
 const CFG = 'ventpromProjects';
 const cfg = () => vscode.workspace.getConfiguration(CFG);
@@ -216,6 +217,8 @@ class Provider {
 }
 
 async function activate(ctx) {
+  sessions.register(ctx);
+
   const store = new Store(ctx);
   await store.init();
 
