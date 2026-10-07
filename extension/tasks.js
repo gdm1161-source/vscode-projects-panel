@@ -128,7 +128,7 @@ function register(ctx) {
   ctx.subscriptions.push(...views);
 
   // Кнопка в строке состояния: если правую панель закрыли (Ctrl+Alt+B, обновление VS Code) — вернуть одним кликом.
-  const bar = vscode.window.createStatusBarItem('ventpromTasks.bar', vscode.StatusBarAlignment.Left, 100);
+  const bar = vscode.window.createStatusBarItem('ventpromTasks.bar', vscode.StatusBarAlignment.Right, 1000);
   bar.name = 'ЗАДАЧИ';
   bar.command = 'ventpromProjects.showTasks';
   bar.show();

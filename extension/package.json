@@ -2,7 +2,7 @@
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
   "description": "Справа: открытые задачи Claude с закрытием и галочками. Слева: сессии Claude и проекты из PROJECTS.md.",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
