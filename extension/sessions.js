@@ -181,4 +181,4 @@ function register(ctx) {
   paint();
 }
 
-module.exports = { register, readSessions, lastTitle };
+module.exports = { register, readSessions, lastTitle, Titles };

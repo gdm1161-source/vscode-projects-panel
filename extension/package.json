@@ -1,8 +1,8 @@
 {
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
-  "description": "Панель слева: сессии Claude на этом ПК и все проекты из PROJECTS.md на сервере.",
-  "version": "1.2.1",
+  "description": "Справа: открытые задачи Claude с закрытием и галочками. Слева: сессии Claude и проекты из PROJECTS.md.",
+  "version": "1.3.0",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
@@ -22,6 +22,13 @@
           "title": "ПРОЕКТЫ ВЕНТПРОМ",
           "icon": "media/vp.svg"
         }
+      ],
+      "secondarySidebar": [
+        {
+          "id": "ventpromTasks",
+          "title": "ЗАДАЧИ",
+          "icon": "media/tasks.svg"
+        }
       ]
     },
     "views": {
@@ -35,6 +42,13 @@
           "id": "ventpromProjects.tree",
           "name": "В работе",
           "icon": "media/vp.svg"
+        }
+      ],
+      "ventpromTasks": [
+        {
+          "id": "ventpromTasks.list",
+          "name": "Задачи",
+          "icon": "media/tasks.svg"
         }
       ]
     },
@@ -84,6 +98,41 @@
         "title": "Скопировать имя для связи",
         "icon": "$(clippy)",
         "category": "ПРОЕКТЫ"
+      },
+      {
+        "command": "ventpromProjects.newTask",
+        "title": "Новая задача",
+        "icon": "$(add)",
+        "category": "ЗАДАЧИ"
+      },
+      {
+        "command": "ventpromProjects.pickClose",
+        "title": "Закрыть несколько (список с галочками)",
+        "icon": "$(list-selection)",
+        "category": "ЗАДАЧИ"
+      },
+      {
+        "command": "ventpromProjects.closeChecked",
+        "title": "Закрыть отмеченные",
+        "icon": "$(close-all)",
+        "category": "ЗАДАЧИ"
+      },
+      {
+        "command": "ventpromProjects.toggleAllTasks",
+        "title": "Отметить все / снять",
+        "icon": "$(check-all)",
+        "category": "ЗАДАЧИ"
+      },
+      {
+        "command": "ventpromProjects.closeTask",
+        "title": "Закрыть задачу",
+        "icon": "$(close)",
+        "category": "ЗАДАЧИ"
+      },
+      {
+        "command": "ventpromProjects.focusTask",
+        "title": "Перейти к задаче",
+        "category": "ЗАДАЧИ"
       }
     ],
     "menus": {
@@ -107,6 +156,26 @@
           "command": "ventpromProjects.refreshSessions",
           "when": "view == ventpromProjects.sessions",
           "group": "navigation@1"
+        },
+        {
+          "command": "ventpromProjects.newTask",
+          "when": "view == ventpromTasks.list",
+          "group": "navigation@1"
+        },
+        {
+          "command": "ventpromProjects.pickClose",
+          "when": "view == ventpromTasks.list",
+          "group": "navigation@2"
+        },
+        {
+          "command": "ventpromProjects.toggleAllTasks",
+          "when": "view == ventpromTasks.list",
+          "group": "navigation@3"
+        },
+        {
+          "command": "ventpromProjects.closeChecked",
+          "when": "view == ventpromTasks.list && ventpromTasks.anyChecked",
+          "group": "navigation@4"
         }
       ],
       "view/item/context": [
@@ -119,6 +188,31 @@
           "command": "ventpromProjects.copySessionName",
           "when": "view == ventpromProjects.sessions && viewItem == vpSession",
           "group": "inline"
+        },
+        {
+          "command": "ventpromProjects.closeTask",
+          "when": "view == ventpromTasks.list && viewItem == vpTask",
+          "group": "inline"
+        },
+        {
+          "command": "ventpromProjects.closeChecked",
+          "when": "view == ventpromTasks.list && viewItem == vpTasksRoot && ventpromTasks.anyChecked",
+          "group": "inline"
+        },
+        {
+          "command": "ventpromProjects.pickClose",
+          "when": "view == ventpromTasks.list && viewItem == vpTasksRoot",
+          "group": "inline"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "ventpromProjects.focusTask",
+          "when": "false"
+        },
+        {
+          "command": "ventpromProjects.closeTask",
+          "when": "false"
         }
       ]
     },
