@@ -127,6 +127,13 @@ function register(ctx) {
     vscode.window.createTreeView(id, { treeDataProvider: provider, manageCheckboxStateManually: true }));
   ctx.subscriptions.push(...views);
 
+  // Кнопка в строке состояния: если правую панель закрыли (Ctrl+Alt+B, обновление VS Code) — вернуть одним кликом.
+  const bar = vscode.window.createStatusBarItem('ventpromTasks.bar', vscode.StatusBarAlignment.Left, 100);
+  bar.name = 'ЗАДАЧИ';
+  bar.command = 'ventpromProjects.showTasks';
+  bar.show();
+  ctx.subscriptions.push(bar);
+
   const paint = () => {
     const list = provider.reload();
     const busy = list.filter(x => x.session && x.session.status === 'busy').length;
@@ -134,6 +141,8 @@ function register(ctx) {
     views[0].title = 'Задачи' + tail;
     views[0].badge = list.length ? { value: list.length, tooltip: list.length + ' открытых задач' } : undefined;
     views[1].title = 'Сессии' + tail;
+    bar.text = '$(checklist) Задачи' + (list.length ? ' ' + list.length : '');
+    bar.tooltip = 'Открыть панель задач справа' + (busy ? ' · работают ' + busy : '');
     vscode.commands.executeCommand('setContext', 'ventpromTasks.anyChecked', provider.checked.size > 0);
   };
   let pending = null;
@@ -195,6 +204,8 @@ function register(ctx) {
     }),
 
     vscode.commands.registerCommand('ventpromProjects.refreshSessions', paint),
+    vscode.commands.registerCommand('ventpromProjects.showTasks', () =>
+      vscode.commands.executeCommand('workbench.view.extension.ventpromTasks')),
     vscode.commands.registerCommand('ventpromProjects.openSession', it => it && it.vpTask && focusTab(it.vpTask)),
     vscode.commands.registerCommand('ventpromProjects.copySessionName', async (it) => {
       const s = it && it.vpSession;

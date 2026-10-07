@@ -2,7 +2,7 @@
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
   "description": "Справа: открытые задачи Claude с закрытием и галочками. Слева: сессии Claude и проекты из PROJECTS.md.",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
@@ -132,6 +132,12 @@
       {
         "command": "ventpromProjects.focusTask",
         "title": "Перейти к задаче",
+        "category": "ЗАДАЧИ"
+      },
+      {
+        "command": "ventpromProjects.showTasks",
+        "title": "Показать панель задач справа",
+        "icon": "$(checklist)",
         "category": "ЗАДАЧИ"
       }
     ],
