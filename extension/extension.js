@@ -3,7 +3,6 @@
 const vscode = require('vscode');
 const cp = require('child_process');
 const { parse, GROUPS } = require('./parser');
-const sessions = require('./sessions');
 const tasks = require('./tasks');
 
 const CFG = 'ventpromProjects';
@@ -227,7 +226,6 @@ class Provider {
 }
 
 async function activate(ctx) {
-  sessions.register(ctx);
   tasks.register(ctx);
 
   const store = new Store(ctx);

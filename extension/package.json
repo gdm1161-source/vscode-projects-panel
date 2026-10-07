@@ -2,7 +2,7 @@
   "name": "ventprom-projects",
   "displayName": "ВЕНТПРОМ — проекты в работе",
   "description": "Справа: открытые задачи Claude с закрытием и галочками. Слева: сессии Claude и проекты из PROJECTS.md.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "publisher": "ventprom",
   "engines": {
     "vscode": "^1.80.0"
@@ -153,28 +153,23 @@
           "group": "navigation@3"
         },
         {
-          "command": "ventpromProjects.refreshSessions",
-          "when": "view == ventpromProjects.sessions",
-          "group": "navigation@1"
-        },
-        {
           "command": "ventpromProjects.newTask",
-          "when": "view == ventpromTasks.list",
+          "when": "(view == ventpromTasks.list || view == ventpromProjects.sessions)",
           "group": "navigation@1"
         },
         {
           "command": "ventpromProjects.pickClose",
-          "when": "view == ventpromTasks.list",
+          "when": "(view == ventpromTasks.list || view == ventpromProjects.sessions)",
           "group": "navigation@2"
         },
         {
           "command": "ventpromProjects.toggleAllTasks",
-          "when": "view == ventpromTasks.list",
+          "when": "(view == ventpromTasks.list || view == ventpromProjects.sessions)",
           "group": "navigation@3"
         },
         {
           "command": "ventpromProjects.closeChecked",
-          "when": "view == ventpromTasks.list && ventpromTasks.anyChecked",
+          "when": "(view == ventpromTasks.list || view == ventpromProjects.sessions) && ventpromTasks.anyChecked",
           "group": "navigation@4"
         }
       ],
@@ -186,22 +181,22 @@
         },
         {
           "command": "ventpromProjects.copySessionName",
-          "when": "view == ventpromProjects.sessions && viewItem == vpSession",
+          "when": "view == ventpromProjects.sessions && viewItem == vpTask",
           "group": "inline"
         },
         {
           "command": "ventpromProjects.closeTask",
-          "when": "view == ventpromTasks.list && viewItem == vpTask",
+          "when": "(view == ventpromTasks.list || view == ventpromProjects.sessions) && viewItem == vpTask",
           "group": "inline"
         },
         {
           "command": "ventpromProjects.closeChecked",
-          "when": "view == ventpromTasks.list && viewItem == vpTasksRoot && ventpromTasks.anyChecked",
+          "when": "(view == ventpromTasks.list || view == ventpromProjects.sessions) && viewItem == vpTasksRoot && ventpromTasks.anyChecked",
           "group": "inline"
         },
         {
           "command": "ventpromProjects.pickClose",
-          "when": "view == ventpromTasks.list && viewItem == vpTasksRoot",
+          "when": "(view == ventpromTasks.list || view == ventpromProjects.sessions) && viewItem == vpTasksRoot",
           "group": "inline"
         }
       ],

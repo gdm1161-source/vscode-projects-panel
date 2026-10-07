@@ -99,6 +99,7 @@ class TasksProvider {
         ? vscode.TreeItemCheckboxState.Checked : vscode.TreeItemCheckboxState.Unchecked;
       it.contextValue = 'vpTask';
       it.vpTask = x;
+      it.vpSession = s;
       it.command = { command: 'ventpromProjects.focusTask', title: 'Перейти', arguments: [it] };
       it.tooltip = x.tab.label + (s ? '\nСтатус: ' + (busy ? 'работает' : 'ждёт ответа') : '') +
         '\nКлик — перейти, ✕ — закрыть, галочка — отметить для закрытия пачкой';
@@ -121,17 +122,18 @@ async function focusTab(x) {
 
 function register(ctx) {
   const provider = new TasksProvider(ctx.workspaceState);
-  const view = vscode.window.createTreeView('ventpromTasks.list', {
-    treeDataProvider: provider,
-    manageCheckboxStateManually: true
-  });
-  ctx.subscriptions.push(view);
+  // Один список — два места: справа (ЗАДАЧИ) и слева в разделе «Сессии Claude».
+  const views = ['ventpromTasks.list', 'ventpromProjects.sessions'].map(id =>
+    vscode.window.createTreeView(id, { treeDataProvider: provider, manageCheckboxStateManually: true }));
+  ctx.subscriptions.push(...views);
 
   const paint = () => {
     const list = provider.reload();
     const busy = list.filter(x => x.session && x.session.status === 'busy').length;
-    view.title = list.length ? 'Задачи: ' + list.length + (busy ? ' · работают ' + busy : '') : 'Задачи';
-    view.badge = list.length ? { value: list.length, tooltip: list.length + ' открытых задач' } : undefined;
+    const tail = list.length ? ': ' + list.length + (busy ? ' · работают ' + busy : '') : '';
+    views[0].title = 'Задачи' + tail;
+    views[0].badge = list.length ? { value: list.length, tooltip: list.length + ' открытых задач' } : undefined;
+    views[1].title = 'Сессии' + tail;
     vscode.commands.executeCommand('setContext', 'ventpromTasks.anyChecked', provider.checked.size > 0);
   };
   let pending = null;
@@ -149,14 +151,14 @@ function register(ctx) {
     vscode.window.tabGroups.onDidChangeTabs(soon),
     vscode.window.tabGroups.onDidChangeTabGroups(soon),
 
-    view.onDidChangeCheckboxState(e => {
+    ...views.map(view => view.onDidChangeCheckboxState(e => {
       for (const [item, st] of e.items) {
         const on = st === vscode.TreeItemCheckboxState.Checked;
         const keys = item.vpRoot ? provider.items.map(x => x.key) : [item.vpTask.key];
         for (const k of keys) on ? provider.checked.add(k) : provider.checked.delete(k);
       }
       paint();
-    }),
+    })),
 
     vscode.commands.registerCommand('ventpromProjects.focusTask', it => it && it.vpTask && focusTab(it.vpTask)),
     vscode.commands.registerCommand('ventpromProjects.closeTask', it => it && it.vpTask && close([it.vpTask])),
@@ -190,6 +192,15 @@ function register(ctx) {
       provider.checked.clear();
       if (!all) for (const x of provider.items) provider.checked.add(x.key);
       paint();
+    }),
+
+    vscode.commands.registerCommand('ventpromProjects.refreshSessions', paint),
+    vscode.commands.registerCommand('ventpromProjects.openSession', it => it && it.vpTask && focusTab(it.vpTask)),
+    vscode.commands.registerCommand('ventpromProjects.copySessionName', async (it) => {
+      const s = it && it.vpSession;
+      if (!s) { vscode.window.showInformationMessage('У этой вкладки нет запущенной сессии — открой её, и имя появится.'); return; }
+      await vscode.env.clipboard.writeText(s.name || s.sessionId);
+      vscode.window.showInformationMessage('Скопировано: ' + (s.name || s.sessionId));
     }),
 
     vscode.commands.registerCommand('ventpromProjects.newTask', () =>
