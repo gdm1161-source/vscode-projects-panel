@@ -127,7 +127,7 @@ function register(ctx) {
     vscode.window.createTreeView(id, { treeDataProvider: provider, manageCheckboxStateManually: true }));
   ctx.subscriptions.push(...views);
 
-  // Кнопка в строке состояния: если правую панель закрыли (Ctrl+Alt+B, обновление VS Code) — вернуть одним кликом.
+  // Кнопка в строке состояния: если панель задач закрыли (Ctrl+B, обновление VS Code) — вернуть одним кликом.
   const bar = vscode.window.createStatusBarItem('ventpromTasks.bar', vscode.StatusBarAlignment.Left, 1000);
   bar.name = 'ЗАДАЧИ';
   bar.command = 'ventpromProjects.showTasks';
@@ -142,7 +142,7 @@ function register(ctx) {
     views[0].badge = list.length ? { value: list.length, tooltip: list.length + ' открытых задач' } : undefined;
     views[1].title = 'Сессии' + tail;
     bar.text = '$(checklist) Задачи' + (list.length ? ' ' + list.length : '');
-    bar.tooltip = 'Открыть панель задач справа' + (busy ? ' · работают ' + busy : '');
+    bar.tooltip = 'Открыть панель задач' + (busy ? ' · работают ' + busy : '');
     vscode.commands.executeCommand('setContext', 'ventpromTasks.anyChecked', provider.checked.size > 0);
   };
   let pending = null;
